@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+</head>
+<body>
+    
+    <div id="cart-items"></div>
+
+<h2 id="totalAmount">Total: ₹0</h2>
+
+</body>
+</html>
+
+<script>
+
+function loadCart() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const container = document.getElementById("cart-items");
+  container.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach(item => {
+    total += item.price * item.qty;
+
+    container.innerHTML += `
+      <div class="cart-item">
+        <h3>${item.title}</h3>
+        <p>₹${item.price}</p>
+        <p>Qty: ${item.qty}</p>
+        <p>Total: ₹${item.price * item.qty}</p>
+      </div>
+    `;
+  });
+
+  document.getElementById("totalAmount").innerText = `Total: ₹${total}`;
+}
+
+loadCart();
+
+</script>

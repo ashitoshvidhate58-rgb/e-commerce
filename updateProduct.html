@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update Product</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        /* 🔹 SEARCH BAR */
+        #search {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        /* 🔹 GRID */
+        #product-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        /* 🔹 PRODUCT CARD */
+        .product {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 🔹 BUTTON */
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        /* 🔹 OVERLAY */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* 🔹 POPUP FORM */
+        .form-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .update-btn {
+            width: 100%;
+            background: #ff5a5f;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            background: gray;
+            color: white;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2 style="text-align:center;">Products</h2>
+
+    <!-- 🔹 SEARCH -->
+    <input type="text" id="search" placeholder="Search by title, brand, category" onkeyup="filterProducts()" />
+
+    <!-- 🔹 PRODUCT LIST -->
+    <div id="product-list"></div>
+
+    <div style="text-align:center; margin-top:20px;">
+        <button onclick="prevPage()">⬅ Prev</button>
+
+        <span id="page-number" style="margin: 0 15px; font-weight:bold;">
+            Page 1
+        </span>
+
+        <button onclick="nextPage()">Next ➡</button>
+    </div>
+
+    <!-- 🔹 OVERLAY -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- 🔹 POPUP FORM -->
+    <div class="form-container" id="form-box">
+        <h3>Edit Product</h3>
+
+        <input type="text" id="title" placeholder="Product name">
+        <input type="number" id="price" placeholder="Price">
+        <input type="text" id="category" placeholder="Category">
+        <input type="text" id="brand" placeholder="Brand">
+        <input type="number" id="rating" placeholder="Rating">
+
+        <button class="update-btn" onclick="updateProduct()">Update Product</button>
+        <button class="cancel-btn" onclick="closeForm()">Cancel</button>
+    </div>
+
+    <script>
+
+
+        const API = "http://localhost:3001";
+
+        let selectedId = null;
+        let allProducts = [];
+        let currentPage = 1;
+        let limit = 12;
+
+        // 🔹 LOAD PRODUCTS
+        async function getProducts() {
+            const res = await fetch(`${API}/products?page=${currentPage}&limit=${limit}`);
+            const data = await res.json();
+
+            allProducts = data.data; // store all products
+            displayProducts(allProducts);
+            document.getElementById("page-number").innerText = `Page ${currentPage}`;
+        }
+
+        function nextPage() {
+            currentPage++;
+            getProducts();
+        }
+
+        function prevPage() {
+            if (currentPage === 1) return;
+            currentPage--;
+            getProducts();
+        }
+
+        // 🔹 DISPLAY FUNCTION
+        function displayProducts(products) {
+            const container = document.getElementById("product-list");
+            container.innerHTML = "";
+
+            if (products.length === 0) {
+                container.innerHTML = "<p>No products found 😢</p>";
+                return;
+            }
+
+            products.forEach(p => {
+                container.innerHTML += `
+      <div class="product">
+        <h3>${p.title}</h3>
+        <p>₹${p.price}</p>
+        <p>${p.category}</p>
+        <p>${p.brand}</p>
+        <p>${p.rating}</p>
+
+        <button class="edit-btn"
+          onclick="editProduct(${p.id}, '${p.title}', ${p.price}, '${p.category}', '${p.brand}', '${p.rating}')">
+          Edit
+        </button>
+      </div>
+    `;
+            });
+        }
+
+        // 🔹 FILTER FUNCTION
+        function filterProducts() {
+            const search = document.getElementById("search").value.toLowerCase();
+
+            const filtered = allProducts.filter(p =>
+                p.title.toLowerCase().includes(search) ||
+                p.brand.toLowerCase().includes(search) ||
+                p.category.toLowerCase().includes(search)
+            );
+
+            displayProducts(filtered);
+        }
+
+        // 🔹 OPEN FORM
+        function editProduct(id, title, price, category, brand, rating) {
+            selectedId = id;
+
+            document.getElementById("title").value = title;
+            document.getElementById("price").value = price;
+            document.getElementById("category").value = category;
+            document.getElementById("brand").value = brand;
+            document.getElementById("rating").value = rating;
+
+            document.getElementById("form-box").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        // 🔹 CLOSE FORM
+        function closeForm() {
+            document.getElementById("form-box").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+            selectedId = null;
+        }
+
+        // 🔹 UPDATE PRODUCT
+        async function updateProduct() {
+            if (!selectedId) {
+                alert("Select product first!");
+                return;
+            }
+
+            const title = document.getElementById("title").value;
+            const price = document.getElementById("price").value;
+            const category = document.getElementById("category").value;
+            const brand = document.getElementById("brand").value;
+            const rating = document.getElementById("rating").value;
+
+            if (!title || !price || !category || !brand || !rating) {
+                alert("Fill all fields!");
+                return;
+            }
+
+            await fetch(`${API}/products/${selectedId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title,
+                    description: "Updated product",
+                    price: Number(price),
+                    category,
+                    brand,
+                    rating
+                })
+            });
+
+            alert("Product Updated!");
+
+            closeForm();
+            getProducts();
+        }
+
+        // 🔹 START
+        getProducts();
+    </script>
+
+</body>
+
+</html>

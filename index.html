@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<link rel="stylesheet" href="style.css">
+
+<body>
+
+    <!-- TOP NAV -->
+    <nav class="topnav">
+        <div class="nav-logo">Zepto<span>Store</span></div>
+        <div class="nav-search-wrap">
+            <input class="nav-search" id="navSearch" placeholder="Search products, brands, categories..."
+                autocomplete="off">
+            <svg class="nav-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+        </div>
+        <div class="nav-actions">
+            
+            <button class="nav-btn nav-btn-cart" onclick="toggleCart()">
+                🛒 Cart
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Price Range</div>
+                <div class="filter-row">
+                    <input class="filter-input" id="minPrice" type="number" placeholder="Min ₹">
+                    <input class="filter-input" id="maxPrice" type="number" placeholder="Max ₹">
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Min Rating</div>
+                <input class="filter-input" id="minRating" type="number" min="1" max="5" step="0.1"
+                    placeholder="e.g. 3.5">
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Sort By</div>
+                <select class="sort-select" id="sortBy">
+                    <option value="createdAt">Newest First</option>
+                    <option value="price">Price</option>
+                    <option value="rating">Rating</option>
+                    <option value="title">Name</option>
+                    <option value="stock">Stock</option>
+                </select>
+                <select class="sort-select" id="sortOrder">
+                    <option value="DESC">High to Low</option>
+                    <option value="ASC">Low to High</option>
+                </select>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Per Page</div>
+                <select class="sort-select" id="perPage">
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="48">48</option>
+                </select>
+            </div>
+            <button class="apply-btn" onclick="applyFilters()">Apply Filters</button>
+            <button class="clear-btn" onclick="clearFilters()">Clear All</button>
+        </aside>
+
+
+    <div class="nav-bar">
+        <ul class="menu">
+
+            <!-- Category (simple link) -->
+            <li>
+                <a href="category.html">Category</a>
+            </li>
+
+            <!-- Functionality with Dropdown -->
+            <li class="dropdown">
+                <a href="#">Functionality</a>
+
+                <ul class="dropdown-menu">
+                    <li><a href="addProduct.html">Add</a></li>
+                    <li><a href="updateProduct.html">Update</a></li>
+                </ul>
+            </li>
+
+
+
+        </ul>
+
+    </div>
+
+    <button onclick="prevPage()">Prev</button>
+<button onclick="nextPage()">Next</button>
+
+
+
+    <div id="product-list"></div>
+
+    <script>
+
+        let currentPage = 1;
+        let limit = 12;
+
+        //********** Fetch data from backend **********//
+
+        const API = "http://localhost:3001";
+
+        // Load products on page load
+        async function getProducts() {
+            const res = await fetch(`${API}/products?page=${currentPage}&limit=${limit}`);
+            const data = await res.json();
+
+            const container = document.getElementById("product-list");
+            container.innerHTML = "";
+
+            data.data.forEach(p => {
+                container.innerHTML += `<div class="product">
+                        <h3>${p.title}</h3> 
+                        <p>Price: ₹${p.price}</p>         
+                        <p>Category: ${p.category}</p>         
+                        <p>Brand: ${p.brand}</p>       
+                        <p>Ratig: ${p.rating}</p>
+                        <button onclick='addToCart(${JSON.stringify(p)})'>Add</button>
+                        <button onclick="deleteProduct(${p.id})">Delete</button>
+                        </div>
+                            `;
+            });
+        }
+
+        getProducts();
+        
+
+        // Delete product
+    async function deleteProduct(id) {
+
+      const confirmDelete = confirm("Are you sure you want to delete?");
+      if (!confirmDelete) return;
+
+      await fetch(`${API}/products/${id}`, {
+        method: "DELETE"
+      });
+
+      alert("Product Deleted!");
+      getProducts(); // refresh list
+    }
+
+    // Load on page start
+    getProducts();
+
+
+    function nextPage() {
+  currentPage++;
+  getProducts();
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    getProducts();
+  }
+}
+
+    </script>
+
+</body>
+
+</html>

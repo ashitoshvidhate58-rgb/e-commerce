@@ -1,0 +1,233 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
+}
+
+/* 🔥 TOP NAVBAR */
+.topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #5c2d91;
+  color: white;
+}
+
+.nav-logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav-logo span {
+  color: #00d084;
+}
+
+/* 🔍 SEARCH */
+.nav-search-wrap {
+  position: relative;
+  width: 40%;
+}
+
+.nav-search {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.nav-search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 🔘 NAV BUTTONS */
+.nav-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.nav-btn-add {
+  background: #00d084;
+  color: white;
+}
+
+.nav-btn-cart {
+  background: white;
+  color: black;
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+/* 🔥 SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 220px;
+  height: 100%;
+  background: white;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.sidebar-section {
+  margin-bottom: 20px;
+}
+
+.filter-input,
+.sort-select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.apply-btn {
+  width: 100%;
+  padding: 10px;
+  background: #5c2d91;
+  color: white;
+  border: none;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.clear-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ddd;
+  border: none;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+/* 🔥 NAV MENU */
+.nav-bar {
+  margin-left: 230px;
+  background: white;
+  padding: 10px;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+/* 🔽 DROPDOWN */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  top: 25px;
+  left: 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.dropdown-menu li {
+  padding: 8px 15px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* 🔥 PRODUCT GRID */
+#product-list {
+  margin-left: 230px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+/* 🛍 PRODUCT CARD */
+.product {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+}
+
+/* 🔘 BUTTONS */
+.product button {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #5c2d91;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* 🔥 PAGINATION */
+button {
+  margin: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #5c2d91;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 900px) {
+  #product-list {
+    grid-template-columns: repeat(2, 1fr);
+    margin-left: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+}
