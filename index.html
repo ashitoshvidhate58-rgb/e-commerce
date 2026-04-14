@@ -1,174 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ZeptoStore - Home</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-<link rel="stylesheet" href="style.css">
-
 <body>
-
-    <!-- TOP NAV -->
-    <nav class="topnav">
-        <div class="nav-logo">Zepto<span>Store</span></div>
-        <div class="nav-search-wrap">
-            <input class="nav-search" id="navSearch" placeholder="Search products, brands, categories..."
-                autocomplete="off">
-            <svg class="nav-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-            </svg>
-        </div>
-        <div class="nav-actions">
-            
-            <button class="nav-btn nav-btn-cart" onclick="toggleCart()">
-                🛒 Cart
-                <span class="cart-badge" id="cartBadge">0</span>
-            </button>
+    <nav class="navbar">
+        <div class="logo">🛍️ ZeptoStore</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">🏠 Home</a>
+            <a href="category.html" class="nav-link">📁 Categories</a>
+            <a href="addProduct.html" class="nav-link">➕ Add Product</a>
+            <a href="updateProduct.html" class="nav-link">✏️ Update Product</a>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 Cart <span class="cart-count" id="cartCount">0</span>
+            </div>
         </div>
     </nav>
 
-    <aside class="sidebar">
-            <div class="sidebar-section">
-                <div class="sidebar-title">Price Range</div>
-                <div class="filter-row">
-                    <input class="filter-input" id="minPrice" type="number" placeholder="Min ₹">
-                    <input class="filter-input" id="maxPrice" type="number" placeholder="Max ₹">
-                </div>
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-title">Min Rating</div>
-                <input class="filter-input" id="minRating" type="number" min="1" max="5" step="0.1"
-                    placeholder="e.g. 3.5">
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-title">Sort By</div>
-                <select class="sort-select" id="sortBy">
-                    <option value="createdAt">Newest First</option>
-                    <option value="price">Price</option>
-                    <option value="rating">Rating</option>
-                    <option value="title">Name</option>
-                    <option value="stock">Stock</option>
-                </select>
-                <select class="sort-select" id="sortOrder">
-                    <option value="DESC">High to Low</option>
-                    <option value="ASC">Low to High</option>
-                </select>
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-title">Per Page</div>
-                <select class="sort-select" id="perPage">
-                    <option value="12">12</option>
-                    <option value="24">24</option>
-                    <option value="48">48</option>
-                </select>
-            </div>
-            <button class="apply-btn" onclick="applyFilters()">Apply Filters</button>
-            <button class="clear-btn" onclick="clearFilters()">Clear All</button>
-        </aside>
-
-
-    <div class="nav-bar">
-        <ul class="menu">
-
-            <!-- Category (simple link) -->
-            <li>
-                <a href="category.html">Category</a>
-            </li>
-
-            <!-- Functionality with Dropdown -->
-            <li class="dropdown">
-                <a href="#">Functionality</a>
-
-                <ul class="dropdown-menu">
-                    <li><a href="addProduct.html">Add</a></li>
-                    <li><a href="updateProduct.html">Update</a></li>
-                </ul>
-            </li>
-
-
-
-        </ul>
-
+    <div class="search-section">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search products by name, brand, or category...">
     </div>
 
-    <button onclick="prevPage()">Prev</button>
-<button onclick="nextPage()">Next</button>
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="filter-group">
+                <h3>💰 Price Range</h3>
+                <div class="price-range">
+                    <input type="number" id="minPrice" class="filter-input" placeholder="Min ₹">
+                    <input type="number" id="maxPrice" class="filter-input" placeholder="Max ₹">
+                </div>
+            </div>
+            <div class="filter-group">
+                <h3>⭐ Minimum Rating</h3>
+                <input type="number" id="minRating" class="filter-input" step="0.1" placeholder="Rating (0-5)">
+            </div>
+            <div class="filter-group">
+                <h3>📊 Sort By</h3>
+                <select id="sortBy" class="filter-select">
+                    <option value="createdAt">Newest First</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Rating: High to Low</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <h3>📄 Items Per Page</h3>
+                <select id="perPage" class="filter-select">
+                    <option value="12">12 items</option>
+                    <option value="24">24 items</option>
+                    <option value="48">48 items</option>
+                </select>
+            </div>
+            <button class="apply-btn" onclick="applyFilters()">🔍 Apply Filters</button>
+            <button class="reset-btn" onclick="resetFilters()">🗑️ Reset All</button>
+        </aside>
 
+        <main>
+            <div id="productsContainer" class="products-grid"></div>
+            <div id="pagination" class="pagination"></div>
+        </main>
+    </div>
 
+    <!-- Cart Drawer -->
+    <div id="cartOverlay" class="cart-overlay">
+        <div class="cart-drawer">
+            <div class="cart-header">
+                <h3>🛒 Your Cart</h3>
+                <button onclick="toggleCart()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <div id="cartItemsList" class="cart-items"></div>
+            <div class="cart-footer">
+                <div style="font-size: 1.2rem; font-weight: bold;">Total: ₹<span id="cartTotal">0</span></div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">💳 Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
 
-    <div id="product-list"></div>
-
+    <script src="script.js"></script>
     <script>
-
         let currentPage = 1;
-        let limit = 12;
+        let totalPages = 1;
+        let totalProducts = 0;
+        let perPage = 12;
+        let filters = {
+            search: '',
+            minPrice: '',
+            maxPrice: '',
+            minRating: '',
+            sortBy: 'createdAt',
+            sortOrder: 'DESC'
+        };
 
-        //********** Fetch data from backend **********//
+        async function loadProducts() {
+            try {
+                let url = `${API}/products?page=${currentPage}&limit=${perPage}`;
+                
+                if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
+                if (filters.minPrice) url += `&minPrice=${filters.minPrice}`;
+                if (filters.maxPrice) url += `&maxPrice=${filters.maxPrice}`;
+                if (filters.minRating) url += `&rating=${filters.minRating}`;
+                
+                let sortField = filters.sortBy;
+                let sortDir = filters.sortOrder;
+                if (filters.sortBy === 'price-asc') { sortField = 'price'; sortDir = 'ASC'; }
+                if (filters.sortBy === 'price-desc') { sortField = 'price'; sortDir = 'DESC'; }
+                if (filters.sortBy === 'rating') { sortField = 'rating'; sortDir = 'DESC'; }
+                if (filters.sortBy === 'createdAt') { sortField = 'createdAt'; sortDir = 'DESC'; }
+                
+                url += `&sortBy=${sortField}&sortOrder=${sortDir}`;
 
-        const API = "http://localhost:3001";
-
-        // Load products on page load
-        async function getProducts() {
-            const res = await fetch(`${API}/products?page=${currentPage}&limit=${limit}`);
-            const data = await res.json();
-
-            const container = document.getElementById("product-list");
-            container.innerHTML = "";
-
-            data.data.forEach(p => {
-                container.innerHTML += `<div class="product">
-                        <h3>${p.title}</h3> 
-                        <p>Price: ₹${p.price}</p>         
-                        <p>Category: ${p.category}</p>         
-                        <p>Brand: ${p.brand}</p>       
-                        <p>Ratig: ${p.rating}</p>
-                        <button onclick='addToCart(${JSON.stringify(p)})'>Add</button>
-                        <button onclick="deleteProduct(${p.id})">Delete</button>
-                        </div>
-                            `;
-            });
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                totalProducts = data.total || 0;
+                totalPages = Math.ceil(totalProducts / perPage);
+                renderProducts(data.data || []);
+                renderPagination();
+            } catch (error) {
+                document.getElementById('productsContainer').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <h3>⚠️ Backend Error</h3>
+                        <p>Make sure JSON Server is running at ${API}</p>
+                        <p>Run: npx json-server --watch db.json --port 3001</p>
+                    </div>
+                `;
+            }
         }
 
-        getProducts();
-        
+        function renderProducts(products) {
+            const container = document.getElementById('productsContainer');
+            if (!products.length) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;">No products found 🔍</div>';
+                return;
+            }
 
-        // Delete product
-    async function deleteProduct(id) {
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-icon">${getCategoryIcon(product.category)}</div>
+                    <div class="product-info">
+                        <div class="product-category">${escapeHtml(product.category || 'Uncategorized')}</div>
+                        <div class="product-title">${escapeHtml(product.title)}</div>
+                        <div class="product-price">₹${(product.price || 0).toLocaleString('en-IN')}</div>
+                        <div class="product-rating">${renderStars(product.rating)}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${escapeHtml(product.brand || 'No brand')}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="add-to-cart" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>🛒 Add to Cart</button>
+                        <button class="delete-product" onclick="deleteProduct(${product.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      const confirmDelete = confirm("Are you sure you want to delete?");
-      if (!confirmDelete) return;
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            try {
+                const response = await fetch(`${API}/products/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Product deleted successfully!');
+                    loadProducts();
+                } else {
+                    showToast('Failed to delete product', 'error');
+                }
+            } catch (error) {
+                showToast('Error deleting product', 'error');
+            }
+        }
 
-      await fetch(`${API}/products/${id}`, {
-        method: "DELETE"
-      });
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
 
-      alert("Product Deleted!");
-      getProducts(); // refresh list
-    }
+            container.innerHTML = `
+                <button onclick="prevPage()" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>
+                <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                <button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+            `;
+        }
 
-    // Load on page start
-    getProducts();
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
 
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
 
-    function nextPage() {
-  currentPage++;
-  getProducts();
-}
+        function applyFilters() {
+            filters.search = document.getElementById('searchInput').value;
+            filters.minPrice = document.getElementById('minPrice').value;
+            filters.maxPrice = document.getElementById('maxPrice').value;
+            filters.minRating = document.getElementById('minRating').value;
+            filters.sortBy = document.getElementById('sortBy').value;
+            perPage = parseInt(document.getElementById('perPage').value);
+            currentPage = 1;
+            loadProducts();
+        }
 
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    getProducts();
-  }
-}
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('minRating').value = '';
+            document.getElementById('sortBy').value = 'createdAt';
+            document.getElementById('perPage').value = '12';
+            filters = { search: '', minPrice: '', maxPrice: '', minRating: '', sortBy: 'createdAt', sortOrder: 'DESC' };
+            perPage = 12;
+            currentPage = 1;
+            loadProducts();
+        }
 
+        document.getElementById('searchInput').addEventListener('keyup', () => {
+            currentPage = 1;
+            applyFilters();
+        });
+
+        loadProducts();
     </script>
-
 </body>
-
 </html>

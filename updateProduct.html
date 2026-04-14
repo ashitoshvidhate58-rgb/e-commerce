@@ -1,277 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Update Product</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-
-        /* 🔹 SEARCH BAR */
-        #search {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        /* 🔹 GRID */
-        #product-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        /* 🔹 PRODUCT CARD */
-        .product {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 🔹 BUTTON */
-        button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .edit-btn {
-            background: #3498db;
-            color: white;
-        }
-
-        /* 🔹 OVERLAY */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        /* 🔹 POPUP FORM */
-        .form-container {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 350px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .update-btn {
-            width: 100%;
-            background: #ff5a5f;
-            color: white;
-            margin-top: 10px;
-        }
-
-        .cancel-btn {
-            width: 100%;
-            background: gray;
-            color: white;
-            margin-top: 5px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product - ZeptoStore</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <nav class="navbar">
+        <div class="logo">🛍️ ZeptoStore</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">🏠 Home</a>
+            <a href="category.html" class="nav-link">📁 Categories</a>
+            <a href="addProduct.html" class="nav-link">➕ Add Product</a>
+            <a href="updateProduct.html" class="nav-link active">✏️ Update Product</a>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 Cart <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </nav>
 
-    <h2 style="text-align:center;">Products</h2>
-
-    <!-- 🔹 SEARCH -->
-    <input type="text" id="search" placeholder="Search by title, brand, category" onkeyup="filterProducts()" />
-
-    <!-- 🔹 PRODUCT LIST -->
-    <div id="product-list"></div>
-
-    <div style="text-align:center; margin-top:20px;">
-        <button onclick="prevPage()">⬅ Prev</button>
-
-        <span id="page-number" style="margin: 0 15px; font-weight:bold;">
-            Page 1
-        </span>
-
-        <button onclick="nextPage()">Next ➡</button>
+    <div class="container">
+        <div class="search-section" style="margin: 0 0 2rem 0; padding: 0;">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search product to update...">
+        </div>
+        <div id="productsContainer" class="products-grid"></div>
+        <div id="pagination" class="pagination"></div>
     </div>
 
-    <!-- 🔹 OVERLAY -->
-    <div id="overlay" class="overlay"></div>
-
-    <!-- 🔹 POPUP FORM -->
-    <div class="form-container" id="form-box">
-        <h3>Edit Product</h3>
-
-        <input type="text" id="title" placeholder="Product name">
-        <input type="number" id="price" placeholder="Price">
-        <input type="text" id="category" placeholder="Category">
-        <input type="text" id="brand" placeholder="Brand">
-        <input type="number" id="rating" placeholder="Rating">
-
-        <button class="update-btn" onclick="updateProduct()">Update Product</button>
-        <button class="cancel-btn" onclick="closeForm()">Cancel</button>
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Product</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Product Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="editPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <input type="number" id="editRating" step="0.1" min="0" max="5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="editCategory">
+                            <option value="Electronics">📱 Electronics</option>
+                            <option value="Clothing">👕 Clothing</option>
+                            <option value="Books">📚 Books</option>
+                            <option value="Sports">⚽ Sports</option>
+                            <option value="Home">🏠 Home</option>
+                            <option value="Beauty">💄 Beauty</option>
+                            <option value="Toys">🧸 Toys</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <input type="text" id="editBrand" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" id="editStock">
+                </div>
+                <button type="button" class="submit-btn" onclick="updateProduct()">💾 Update Product</button>
+            </form>
+        </div>
     </div>
 
+    <!-- Cart Drawer -->
+    <div id="cartOverlay" class="cart-overlay">
+        <div class="cart-drawer">
+            <div class="cart-header">
+                <h3>🛒 Your Cart</h3>
+                <button onclick="toggleCart()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <div id="cartItemsList" class="cart-items"></div>
+            <div class="cart-footer">
+                <div style="font-size: 1.2rem; font-weight: bold;">Total: ₹<span id="cartTotal">0</span></div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">💳 Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
     <script>
-
-
-        const API = "http://localhost:3001";
-
-        let selectedId = null;
-        let allProducts = [];
         let currentPage = 1;
-        let limit = 12;
+        let totalPages = 1;
+        let totalProducts = 0;
+        let searchTerm = '';
+        let perPage = 12;
 
-        // 🔹 LOAD PRODUCTS
-        async function getProducts() {
-            const res = await fetch(`${API}/products?page=${currentPage}&limit=${limit}`);
-            const data = await res.json();
-
-            allProducts = data.data; // store all products
-            displayProducts(allProducts);
-            document.getElementById("page-number").innerText = `Page ${currentPage}`;
+        async function loadProducts() {
+            try {
+                let url = `${API}/products?page=${currentPage}&limit=${perPage}`;
+                if (searchTerm) {
+                    url += `&search=${encodeURIComponent(searchTerm)}`;
+                }
+                const response = await fetch(url);
+                const data = await response.json();
+                totalProducts = data.total || 0;
+                totalPages = Math.ceil(totalProducts / perPage);
+                renderProducts(data.data || []);
+                renderPagination();
+            } catch (error) {
+                document.getElementById('productsContainer').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <h3>⚠️ Backend Error</h3>
+                        <p>Make sure JSON Server is running at ${API}</p>
+                    </div>
+                `;
+            }
         }
 
-        function nextPage() {
-            currentPage++;
-            getProducts();
+        function renderProducts(products) {
+            const container = document.getElementById('productsContainer');
+            if (!products.length) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;">No products found</div>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-icon">${getCategoryIcon(product.category)}</div>
+                    <div class="product-info">
+                        <div class="product-category">${escapeHtml(product.category || 'Uncategorized')}</div>
+                        <div class="product-title">${escapeHtml(product.title)}</div>
+                        <div class="product-price">₹${(product.price || 0).toLocaleString('en-IN')}</div>
+                        <div class="product-rating">${renderStars(product.rating)}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${escapeHtml(product.brand || 'No brand')}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="add-to-cart" onclick='openEditModal(${JSON.stringify(product).replace(/'/g, "&#39;")})'>✏️ Edit Product</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <button onclick="prevPage()" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>
+                <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                <button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+            `;
         }
 
         function prevPage() {
-            if (currentPage === 1) return;
-            currentPage--;
-            getProducts();
+            if (currentPage > 1) {
+                currentPage--;
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
-        // 🔹 DISPLAY FUNCTION
-        function displayProducts(products) {
-            const container = document.getElementById("product-list");
-            container.innerHTML = "";
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
 
-            if (products.length === 0) {
-                container.innerHTML = "<p>No products found 😢</p>";
+        // SOLUTION 3: Updated openEditModal with better error handling
+        function openEditModal(product) {
+            if (!product || !product.id) {
+                showToast('Invalid product data', 'error');
                 return;
             }
-
-            products.forEach(p => {
-                container.innerHTML += `
-      <div class="product">
-        <h3>${p.title}</h3>
-        <p>₹${p.price}</p>
-        <p>${p.category}</p>
-        <p>${p.brand}</p>
-        <p>${p.rating}</p>
-
-        <button class="edit-btn"
-          onclick="editProduct(${p.id}, '${p.title}', ${p.price}, '${p.category}', '${p.brand}', '${p.rating}')">
-          Edit
-        </button>
-      </div>
-    `;
-            });
+            
+            document.getElementById('editId').value = product.id;
+            document.getElementById('editTitle').value = product.title || '';
+            document.getElementById('editPrice').value = product.price || 0;
+            document.getElementById('editRating').value = product.rating || '';
+            document.getElementById('editCategory').value = product.category || 'Electronics';
+            document.getElementById('editBrand').value = product.brand || '';
+            document.getElementById('editDescription').value = product.description || '';
+            document.getElementById('editStock').value = product.stock || 0;
+            document.getElementById('editModal').classList.add('open');
         }
 
-        // 🔹 FILTER FUNCTION
-        function filterProducts() {
-            const search = document.getElementById("search").value.toLowerCase();
-
-            const filtered = allProducts.filter(p =>
-                p.title.toLowerCase().includes(search) ||
-                p.brand.toLowerCase().includes(search) ||
-                p.category.toLowerCase().includes(search)
-            );
-
-            displayProducts(filtered);
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('open');
         }
 
-        // 🔹 OPEN FORM
-        function editProduct(id, title, price, category, brand, rating) {
-            selectedId = id;
-
-            document.getElementById("title").value = title;
-            document.getElementById("price").value = price;
-            document.getElementById("category").value = category;
-            document.getElementById("brand").value = brand;
-            document.getElementById("rating").value = rating;
-
-            document.getElementById("form-box").style.display = "block";
-            document.getElementById("overlay").style.display = "block";
-        }
-
-        // 🔹 CLOSE FORM
-        function closeForm() {
-            document.getElementById("form-box").style.display = "none";
-            document.getElementById("overlay").style.display = "none";
-            selectedId = null;
-        }
-
-        // 🔹 UPDATE PRODUCT
+        // SOLUTION 1 & 2: Updated updateProduct with better error handling and product existence check
         async function updateProduct() {
-            if (!selectedId) {
-                alert("Select product first!");
+            const id = document.getElementById('editId').value;
+            const updatedProduct = {
+                title: document.getElementById('editTitle').value,
+                price: parseFloat(document.getElementById('editPrice').value),
+                rating: parseFloat(document.getElementById('editRating').value) || 0,
+                category: document.getElementById('editCategory').value,
+                brand: document.getElementById('editBrand').value,
+                description: document.getElementById('editDescription').value,
+                stock: parseInt(document.getElementById('editStock').value) || 0,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (!updatedProduct.title || !updatedProduct.price || !updatedProduct.brand) {
+                showToast('Please fill all required fields!', 'error');
                 return;
             }
 
-            const title = document.getElementById("title").value;
-            const price = document.getElementById("price").value;
-            const category = document.getElementById("category").value;
-            const brand = document.getElementById("brand").value;
-            const rating = document.getElementById("rating").value;
+            try {
+                console.log(`Updating product ${id} with:`, updatedProduct);
+                console.log(`API endpoint: ${API}/products/${id}`);
 
-            if (!title || !price || !category || !brand || !rating) {
-                alert("Fill all fields!");
-                return;
+                // If product exists, update it using PATCH (not PUT)
+                const response = await fetch(`${API}/products/${id}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(updatedProduct)
+                });
+
+                console.log(`Response status: ${response.status}`);
+
+                if (response.ok) {
+                    showToast('Product updated successfully! ✅');
+                    closeModal();
+                    loadProducts(); // Refresh the list
+                } else if (response.status === 404) {
+                    showToast('Product not found! It may have been deleted.', 'error');
+                    closeModal();
+                    loadProducts();
+                } else {
+                    const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    showToast(error.message || `Failed to update product (${response.status})`, 'error');
+                    console.error('Update failed:', error);
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Error: ' + error.message + '. Make sure backend is running at ' + API, 'error');
             }
-
-            await fetch(`${API}/products/${selectedId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    title,
-                    description: "Updated product",
-                    price: Number(price),
-                    category,
-                    brand,
-                    rating
-                })
-            });
-
-            alert("Product Updated!");
-
-            closeForm();
-            getProducts();
         }
 
-        // 🔹 START
-        getProducts();
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            currentPage = 1;
+            loadProducts();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        loadProducts();
     </script>
-
 </body>
-
 </html>

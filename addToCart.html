@@ -3,43 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
+    <title>Checkout - ZeptoStore</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div id="cart-items"></div>
+    <nav class="navbar">
+        <div class="logo">🛍️ ZeptoStore</div>
+        <a href="index.html" class="nav-link">← Continue Shopping</a>
+    </nav>
 
-<h2 id="totalAmount">Total: ₹0</h2>
+    <div class="container">
+        <div class="checkout-container">
+            <div class="cart-items-section">
+                <h2 style="margin-bottom: 1rem;">🛒 Your Cart Items</h2>
+                <div id="cartItems"></div>
+            </div>
 
+            <div class="summary-card">
+                <h3 style="margin-bottom: 1rem;">📋 Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹<span id="subtotal">0</span></span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span style="color: #27ae60;">FREE</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Amount</span>
+                    <span>₹<span id="totalAmount">0</span></span>
+                </div>
+                <button class="checkout-btn" onclick="placeOrder()">✅ Place Order</button>
+                <a href="index.html" style="display: block; text-align: center; margin-top: 0.5rem; padding: 0.8rem; background: #ecf0f1; color: #333; text-decoration: none; border-radius: 8px;">← Back to Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://localhost:3001";
+        
+        function getCategoryIcon(category) {
+            const icons = {
+                'Electronics': '📱', 'Clothing': '👕', 'Books': '📚',
+                'Sports': '⚽', 'Home': '🏠', 'Beauty': '💄', 'Toys': '🧸'
+            };
+            return icons[category] || '📦';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <div style="font-size: 4rem;">🛒</div>
+                        <h3>Your cart is empty</h3>
+                        <p>Add some products to your cart first!</p>
+                        <a href="index.html" style="display: inline-block; margin-top: 1rem; padding: 0.8rem 2rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 8px;">Start Shopping</a>
+                    </div>
+                `;
+                document.getElementById('subtotal').textContent = '0';
+                document.getElementById('totalAmount').textContent = '0';
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                return `
+                    <div style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f5f7fa, #c3cfe2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">${getCategoryIcon(item.category)}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">${escapeHtml(item.title)}</div>
+                            <div style="color: #27ae60;">₹${item.price}</div>
+                            <div style="color: #666; font-size: 0.85rem;">Quantity: ${item.quantity}</div>
+                        </div>
+                        <div style="font-weight: bold;">₹${itemTotal}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('subtotal').textContent = subtotal.toLocaleString('en-IN');
+            document.getElementById('totalAmount').textContent = subtotal.toLocaleString('en-IN');
+        }
+
+        function placeOrder() {
+            if (cart.length === 0) {
+                showToast('Cart is empty!', 'error');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (confirm(`🛍️ Confirm Your Order\n\nTotal Amount: ₹${total.toLocaleString('en-IN')}\nItems: ${cart.length}\n\nClick OK to place your order.`)) {
+                showToast('🎉 Order placed successfully! Thank you for shopping!');
+                localStorage.removeItem('cart');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+
+        renderCart();
+    </script>
 </body>
 </html>
-
-<script>
-
-function loadCart() {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  const container = document.getElementById("cart-items");
-  container.innerHTML = "";
-
-  let total = 0;
-
-  cart.forEach(item => {
-    total += item.price * item.qty;
-
-    container.innerHTML += `
-      <div class="cart-item">
-        <h3>${item.title}</h3>
-        <p>₹${item.price}</p>
-        <p>Qty: ${item.qty}</p>
-        <p>Total: ₹${item.price * item.qty}</p>
-      </div>
-    `;
-  });
-
-  document.getElementById("totalAmount").innerText = `Total: ₹${total}`;
-}
-
-loadCart();
-
-</script>

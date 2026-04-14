@@ -1,110 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Add Product</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.container {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  width: 300px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: #ff5a5f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #e04e52;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - ZeptoStore</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <nav class="navbar">
+        <div class="logo">🛍️ ZeptoStore</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">🏠 Home</a>
+            <a href="category.html" class="nav-link">📁 Categories</a>
+            <a href="addProduct.html" class="nav-link active">➕ Add Product</a>
+            <a href="updateProduct.html" class="nav-link">✏️ Update Product</a>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 Cart <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </nav>
 
-<div class="container">
-  <h2>Add Product</h2>
+    <div class="container">
+        <div class="form-container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">➕ Add New Product</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label>Product Title *</label>
+                    <input type="text" id="title" required placeholder="Enter product name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input type="number" id="price" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <input type="number" id="rating" step="0.1" min="0" max="5" placeholder="4.5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">📱 Electronics</option>
+                            <option value="Clothing">👕 Clothing</option>
+                            <option value="Books">📚 Books</option>
+                            <option value="Sports">⚽ Sports</option>
+                            <option value="Home">🏠 Home</option>
+                            <option value="Beauty">💄 Beauty</option>
+                            <option value="Toys">🧸 Toys</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Brand *</label>
+                        <input type="text" id="brand" required placeholder="Brand name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="description" rows="3" placeholder="Product description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Stock Quantity</label>
+                    <input type="number" id="stock" placeholder="Available stock">
+                </div>
+                <button type="button" class="submit-btn" onclick="addProduct()">✨ Add Product</button>
+            </form>
+        </div>
+    </div>
 
-  <input type="text" id="title" placeholder="Product name">
-  <input type="number" id="price" placeholder="Price">
-  <input type="text" id="category" placeholder="Category">
-  <input type="text" id="brand" placeholder="Brand">
-  <input type="number" id="rating" placeholder="Ratig">
+    <!-- Cart Drawer -->
+    <div id="cartOverlay" class="cart-overlay">
+        <div class="cart-drawer">
+            <div class="cart-header">
+                <h3>🛒 Your Cart</h3>
+                <button onclick="toggleCart()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <div id="cartItemsList" class="cart-items"></div>
+            <div class="cart-footer">
+                <div style="font-size: 1.2rem; font-weight: bold;">Total: ₹<span id="cartTotal">0</span></div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">💳 Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
 
-  <button onclick="addProduct()">Add Product</button>
-</div>
+    <script src="script.js"></script>
+    <script>
+        async function addProduct() {
+            const title = document.getElementById('title').value.trim();
+            const price = document.getElementById('price').value;
+            const category = document.getElementById('category').value;
+            const brand = document.getElementById('brand').value.trim();
+            const rating = document.getElementById('rating').value;
+            const description = document.getElementById('description').value;
+            const stock = document.getElementById('stock').value;
 
-<script>
-const API = "http://localhost:3001";
+            if (!title || !price || !category || !brand) {
+                showToast('Please fill all required fields!', 'error');
+                return;
+            }
 
-async function addProduct() {
-  const title = document.getElementById("title").value;
-  const price = document.getElementById("price").value;
-  const category = document.getElementById("category").value;
-  const brand = document.getElementById("brand").value;
-  const rating = document.getElementById("rating").value;
+            const product = {
+                title,
+                description: description || 'No description',
+                price: parseFloat(price),
+                category,
+                brand,
+                rating: parseFloat(rating) || 0,
+                stock: parseInt(stock) || 0,
+                createdAt: new Date().toISOString()
+            };
 
-  if (!title || !price || !category || !brand || !rating) {
-    alert("Please fill all fields!");
-    return;
-  }
+            try {
+                const response = await fetch(`${API}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(product)
+                });
 
-  await fetch(`${API}/products`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      title,
-      description: "Sample product",
-      price: Number(price),
-      category,
-      brand, rating
-    })
-  });
-
-  alert("Product Added!");
-
-  // clear inputs
-  document.getElementById("title").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("category").value = "";
-  document.getElementById("brand").value = "";
-  document.getElementById("rating").value = "";
-}
-</script>
-
+                if (response.ok) {
+                    showToast('Product added successfully! 🎉');
+                    document.getElementById('productForm').reset();
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showToast('Failed to add product', 'error');
+                }
+            } catch (error) {
+                showToast('Error connecting to server', 'error');
+            }
+        }
+    </script>
 </body>
 </html>
