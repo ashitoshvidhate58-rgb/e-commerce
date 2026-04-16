@@ -2,13 +2,206 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeptoStore - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Home - ZeptoStore</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Pagination Styles - Numbered Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-btn, .page-number {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 0.8rem;
+            background: white;
+            color: #667eea;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number {
+            background: white;
+            color: #333;
+        }
+
+        .page-number.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .page-btn:hover:not(:disabled), .page-number:hover:not(.active) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-dots {
+            padding: 0 0.5rem;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        /* Sidebar Filter Styles */
+        .filter-sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .filter-sidebar.open {
+            left: 0;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .filter-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close-filter {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .filter-buttons button {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .apply-filter-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .reset-filter-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .filter-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 999;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .pagination-controls {
+                gap: 0.3rem;
+            }
+            
+            .page-btn, .page-number {
+                min-width: 32px;
+                height: 32px;
+                padding: 0 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-btn, .page-number {
+                min-width: 28px;
+                height: 28px;
+                padding: 0 0.4rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">🛍️ ZeptoStore</div>
+        <div class="logo">🛍️ E-commerce</div>
         <div class="nav-links">
             <a href="index.html" class="nav-link active">🏠 Home</a>
             <a href="category.html" class="nav-link">📁 Categories</a>
@@ -20,48 +213,59 @@
         </div>
     </nav>
 
-    <div class="search-section">
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search products by name, brand, or category...">
+    <div class="container">
+        <div id="productsContainer" class="products-grid"></div>
+        
+        <!-- Numbered Pagination Bottom -->
+        <div id="pagination" class="pagination"></div>
     </div>
 
-    <div class="main-layout">
-        <aside class="sidebar">
-            <div class="filter-group">
-                <h3>💰 Price Range</h3>
-                <div class="price-range">
-                    <input type="number" id="minPrice" class="filter-input" placeholder="Min ₹">
-                    <input type="number" id="maxPrice" class="filter-input" placeholder="Max ₹">
-                </div>
-            </div>
-            <div class="filter-group">
-                <h3>⭐ Minimum Rating</h3>
-                <input type="number" id="minRating" class="filter-input" step="0.1" placeholder="Rating (0-5)">
-            </div>
-            <div class="filter-group">
-                <h3>📊 Sort By</h3>
-                <select id="sortBy" class="filter-select">
-                    <option value="createdAt">Newest First</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="rating">Rating: High to Low</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <h3>📄 Items Per Page</h3>
-                <select id="perPage" class="filter-select">
-                    <option value="12">12 items</option>
-                    <option value="24">24 items</option>
-                    <option value="48">48 items</option>
-                </select>
-            </div>
-            <button class="apply-btn" onclick="applyFilters()">🔍 Apply Filters</button>
-            <button class="reset-btn" onclick="resetFilters()">🗑️ Reset All</button>
-        </aside>
+    <!-- Filter Sidebar -->
+    <div id="filterSidebar" class="filter-sidebar">
+        <div class="filter-header">
+            <h3>🔍 Filter Products</h3>
+            <button class="close-filter" onclick="toggleFilterSidebar()">✕</button>
+        </div>
+        
+        <div class="filter-group">
+            <label>💰 Min Price</label>
+            <input type="number" id="minPrice" placeholder="Min Price" step="1000">
+        </div>
+        
+        <div class="filter-group">
+            <label>💰 Max Price</label>
+            <input type="number" id="maxPrice" placeholder="Max Price" step="1000">
+        </div>
+        
+        <div class="filter-group">
+            <label>⭐ Min Rating</label>
+            <select id="minRating">
+                <option value="">Any Rating</option>
+                <option value="4">4★ & above</option>
+                <option value="3">3★ & above</option>
+                <option value="2">2★ & above</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>📊 Sort By</label>
+            <select id="sortBy">
+                <option value="createdAt">Latest First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+            </select>
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="apply-filter-btn" onclick="applyFilters()">Apply</button>
+            <button class="reset-filter-btn" onclick="resetFilters()">Reset</button>
+        </div>
+    </div>
 
-        <main>
-            <div id="productsContainer" class="products-grid"></div>
-            <div id="pagination" class="pagination"></div>
-        </main>
+    <!-- Filter Icon Button -->
+    <div class="filter-icon" onclick="toggleFilterSidebar()">
+        🔍
     </div>
 
     <!-- Cart Drawer -->
@@ -81,57 +285,114 @@
 
     <script src="script.js"></script>
     <script>
+        // ==================== PAGINATION VARIABLES ====================
         let currentPage = 1;
         let totalPages = 1;
         let totalProducts = 0;
         let perPage = 12;
+        
+        // ==================== FILTERS VARIABLES ====================
         let filters = {
-            search: '',
             minPrice: '',
             maxPrice: '',
             minRating: '',
-            sortBy: 'createdAt',
-            sortOrder: 'DESC'
+            sortBy: 'createdAt'
         };
 
+        // ==================== URL HELPERS ====================
+        function updateURL() {
+            let hash = `page=${currentPage}`;
+            if (filters.minPrice) hash += `&minPrice=${filters.minPrice}`;
+            if (filters.maxPrice) hash += `&maxPrice=${filters.maxPrice}`;
+            if (filters.minRating) hash += `&minRating=${filters.minRating}`;
+            if (filters.sortBy && filters.sortBy !== 'createdAt') hash += `&sortBy=${filters.sortBy}`;
+            window.location.hash = hash;
+        }
+
+        function getFiltersFromURL() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            
+            const page = parseInt(params.get('page'));
+            if (!isNaN(page) && page > 0) {
+                currentPage = page;
+            }
+            
+            filters.minPrice = params.get('minPrice') || '';
+            filters.maxPrice = params.get('maxPrice') || '';
+            filters.minRating = params.get('minRating') || '';
+            filters.sortBy = params.get('sortBy') || 'createdAt';
+            
+            document.getElementById('minPrice').value = filters.minPrice;
+            document.getElementById('maxPrice').value = filters.maxPrice;
+            document.getElementById('minRating').value = filters.minRating;
+            document.getElementById('sortBy').value = filters.sortBy;
+        }
+
+        // ==================== FILTER SIDEBAR FUNCTIONS ====================
+        function toggleFilterSidebar() {
+            const sidebar = document.getElementById('filterSidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // ==================== PRODUCTS LOADING ====================
         async function loadProducts() {
             try {
+                const container = document.getElementById('productsContainer');
+                if (container) {
+                    container.innerHTML = '<div class="loading">Loading products... ⏳</div>';
+                }
+                
                 let url = `${API}/products?page=${currentPage}&limit=${perPage}`;
                 
-                if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
                 if (filters.minPrice) url += `&minPrice=${filters.minPrice}`;
                 if (filters.maxPrice) url += `&maxPrice=${filters.maxPrice}`;
                 if (filters.minRating) url += `&rating=${filters.minRating}`;
                 
-                let sortField = filters.sortBy;
-                let sortDir = filters.sortOrder;
-                if (filters.sortBy === 'price-asc') { sortField = 'price'; sortDir = 'ASC'; }
-                if (filters.sortBy === 'price-desc') { sortField = 'price'; sortDir = 'DESC'; }
-                if (filters.sortBy === 'rating') { sortField = 'rating'; sortDir = 'DESC'; }
-                if (filters.sortBy === 'createdAt') { sortField = 'createdAt'; sortDir = 'DESC'; }
+                let sortField = 'createdAt';
+                let sortDir = 'DESC';
+                
+                if (filters.sortBy === 'price-asc') {
+                    sortField = 'price';
+                    sortDir = 'ASC';
+                } else if (filters.sortBy === 'price-desc') {
+                    sortField = 'price';
+                    sortDir = 'DESC';
+                } else if (filters.sortBy === 'rating') {
+                    sortField = 'rating';
+                    sortDir = 'DESC';
+                }
                 
                 url += `&sortBy=${sortField}&sortOrder=${sortDir}`;
-
+                
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 totalProducts = data.total || 0;
                 totalPages = Math.ceil(totalProducts / perPage);
+                
                 renderProducts(data.data || []);
                 renderPagination();
+                
             } catch (error) {
-                document.getElementById('productsContainer').innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                        <h3>⚠️ Backend Error</h3>
-                        <p>Make sure JSON Server is running at ${API}</p>
-                        <p>Run: npx json-server --watch db.json --port 3001</p>
-                    </div>
-                `;
+                console.error('Error loading products:', error);
+                const container = document.getElementById('productsContainer');
+                if (container) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                            <h3>⚠️ Backend Error</h3>
+                            <p>Make sure JSON Server is running at ${API}</p>
+                            <p>Run: npx json-server --watch db.json --port 3001</p>
+                        </div>
+                    `;
+                }
             }
         }
 
         function renderProducts(products) {
             const container = document.getElementById('productsContainer');
+            if (!container) return;
+            
             if (!products.length) {
                 container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;">No products found 🔍</div>';
                 return;
@@ -155,6 +416,131 @@
             `).join('');
         }
 
+        // ==================== NUMBERED PAGINATION WITH < and > ====================
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            if (!container) return;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '<div class="pagination-controls">';
+            
+            // Previous Button (<)
+            paginationHTML += `
+                <button class="page-btn" onclick="prevPage()" ${currentPage === 1 ? 'disabled' : ''}>
+                    &lt;
+                </button>
+            `;
+            
+            // Page Numbers (1 2 3 4 5 ... 10)
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            // First page + dots
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-number" onclick="goToPage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="page-dots">...</span>`;
+                }
+            }
+            
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="page-number ${currentPage === i ? 'active' : ''}" 
+                            onclick="goToPage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Last page + dots
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="page-dots">...</span>`;
+                }
+                paginationHTML += `<button class="page-number" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            // Next Button (>)
+            paginationHTML += `
+                <button class="page-btn" onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>
+                    &gt;
+                </button>
+            `;
+            
+            paginationHTML += `</div>`;
+            paginationHTML += `<div class="page-info-text">Page ${currentPage} of ${totalPages} | ${totalProducts} products</div>`;
+            
+            container.innerHTML = paginationHTML;
+        }
+        
+        function goToPage(page) {
+            if (page !== currentPage && page >= 1 && page <= totalPages) {
+                currentPage = page;
+                updateURL();
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateURL();
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateURL();
+                loadProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // ==================== FILTER FUNCTIONS ====================
+        function applyFilters() {
+            filters.minPrice = document.getElementById('minPrice').value;
+            filters.maxPrice = document.getElementById('maxPrice').value;
+            filters.minRating = document.getElementById('minRating').value;
+            filters.sortBy = document.getElementById('sortBy').value;
+            currentPage = 1;
+            updateURL();
+            loadProducts();
+            toggleFilterSidebar();
+        }
+
+        function resetFilters() {
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('minRating').value = '';
+            document.getElementById('sortBy').value = 'createdAt';
+            
+            filters = {
+                minPrice: '',
+                maxPrice: '',
+                minRating: '',
+                sortBy: 'createdAt'
+            };
+            currentPage = 1;
+            updateURL();
+            loadProducts();
+            toggleFilterSidebar();
+        }
+
+        // ==================== DELETE PRODUCT ====================
         async function deleteProduct(id) {
             if (!confirm('Are you sure you want to delete this product?')) return;
             try {
@@ -170,65 +556,14 @@
             }
         }
 
-        function renderPagination() {
-            const container = document.getElementById('pagination');
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-
-            container.innerHTML = `
-                <button onclick="prevPage()" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>
-                <span class="page-info">Page ${currentPage} of ${totalPages}</span>
-                <button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
-            `;
-        }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                loadProducts();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function nextPage() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                loadProducts();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function applyFilters() {
-            filters.search = document.getElementById('searchInput').value;
-            filters.minPrice = document.getElementById('minPrice').value;
-            filters.maxPrice = document.getElementById('maxPrice').value;
-            filters.minRating = document.getElementById('minRating').value;
-            filters.sortBy = document.getElementById('sortBy').value;
-            perPage = parseInt(document.getElementById('perPage').value);
-            currentPage = 1;
+        // ==================== WATCH URL CHANGES ====================
+        window.addEventListener('hashchange', function() {
+            getFiltersFromURL();
             loadProducts();
-        }
-
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('minPrice').value = '';
-            document.getElementById('maxPrice').value = '';
-            document.getElementById('minRating').value = '';
-            document.getElementById('sortBy').value = 'createdAt';
-            document.getElementById('perPage').value = '12';
-            filters = { search: '', minPrice: '', maxPrice: '', minRating: '', sortBy: 'createdAt', sortOrder: 'DESC' };
-            perPage = 12;
-            currentPage = 1;
-            loadProducts();
-        }
-
-        document.getElementById('searchInput').addEventListener('keyup', () => {
-            currentPage = 1;
-            applyFilters();
         });
 
+        // ==================== INITIALIZE PAGE ====================
+        getFiltersFromURL();
         loadProducts();
     </script>
 </body>

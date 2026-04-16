@@ -1,10 +1,21 @@
+//User clicks "Add to Cart" → addToCart() → Updates cart array → updateCartDisplay() → Saves to localStorage
+
+//Cart icon clicked → toggleCart() → Shows cart sidebar → renderCartItems() displays items with prices
+
+//Checkout button → proceedToCheckout() → Redirects to payment page
+
+
+
 // API URL
 const API = "http://localhost:3001";
 
 // Cart Management
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-// Toast notification
+                    // Toast notification                               
+// Creates a temporary notification popup that appears for 2 seconds
+//Used to show success/error messages like "Product added to cart"
+
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -13,7 +24,10 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 2000);
 }
 
-// Escape HTML
+                    // Escape HTML
+//Security function - prevents XSS attacks by converting special characters (&, <, >) to HTML entities
+//Example: <script> becomes &lt;script&gt;
+
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -24,7 +38,10 @@ function escapeHtml(str) {
     });
 }
 
-// Get category icon
+                    // Get category icon
+//Returns an emoji icon based on product category
+//Default: 📦 if category not found
+
 function getCategoryIcon(category) {
     const icons = {
         'Electronics': '📱', 'Clothing': '👕', 'Books': '📚',
@@ -33,7 +50,10 @@ function getCategoryIcon(category) {
     return icons[category] || '📦';
 }
 
-// Render stars
+                    // Render stars
+//Converts numeric rating (e.g., 4.2) to star display
+//Example: rating 4.2 → "⭐⭐⭐⭐☆ 4.2"
+
 function renderStars(rating) {
     if (!rating) return '⭐ New';
     const full = Math.floor(rating);
@@ -42,7 +62,11 @@ function renderStars(rating) {
     return `${stars} ${rating.toFixed(1)}`;
 }
 
-// Cart Functions
+                    // Cart Functions
+//Updates cart badge number, refreshes cart items list, and saves to localStorage
+//reduce() calculates total quantity by summing all item quantities
+//Saves to localStorage so cart persists after page refresh
+
 function updateCartDisplay() {
     const cartCount = document.getElementById('cartCount');
     if (cartCount) {
@@ -97,6 +121,10 @@ function addToCart(product) {
     showToast(`${product.title} added to cart!`);
 }
 
+//delta = 1 → increase quantity
+//delta = -1 → decrease quantity
+//If quantity becomes 0, removes item from cart completely
+
 function updateQuantity(id, delta) {
     const item = cart.find(item => item.id === id);
     if (item) {
@@ -108,11 +136,17 @@ function updateQuantity(id, delta) {
     }
 }
 
+//Filters out the product with matching id
+//Shows removal confirmation toast
+
 function removeFromCart(id) {
     cart = cart.filter(item => item.id !== id);
     updateCartDisplay();
     showToast('Item removed from cart');
 }
+
+
+//Opens/closes cart sidebar overlay by toggling 'open' CSS class
 
 function toggleCart() {
     const overlay = document.getElementById('cartOverlay');
@@ -120,6 +154,11 @@ function toggleCart() {
         overlay.classList.toggle('open');
     }
 }
+
+
+//Validates cart isn't empty
+//Saves cart to localStorage
+//Redirects to checkout page (addToCart.html)
 
 function proceedToCheckout() {
     if (cart.length === 0) {
